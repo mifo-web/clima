@@ -1,52 +1,111 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Clima en Argentina</title>
+  <meta charset="UTF-8">
+  <title>Clima en Argentina</title>
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
-  margin: 0;
-  padding: 15px;
-}
+  <!-- Fuente linda -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
-h1 {
-  text-align: center;
-}
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #fafafa;
+      margin: 0;
+      padding: 30px;
+      color: #333;
+    }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
-}
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-weight: 600;
+    }
 
-iframe {
-  width: 100%;
-  height: 150px;
-  border: none;
-  border-radius: 8px;
-}
-</style>
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    .city {
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .temp {
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .emoji {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+  </style>
 </head>
 
 <body>
 
-<h1>Clima en Argentina</h1>
+<h1>🌤 Clima en Argentina</h1>
 
-<div class="grid">
+<div class="grid" id="clima"></div>
 
-  <iframe src="https://wttr.in/Buenos%20Aires?format=3"></iframe>
-  <iframe src="https://wttr.in/Córdoba?format=3"></iframe>
-  <iframe src="https://wttr.in/Santa%20Fe?format=3"></iframe>
-  <iframe src="https://wttr.in/Mendoza?format=3"></iframe>
-  <iframe src="https://wttr.in/Salta?format=3"></iframe>
-  <iframe src="https://wttr.in/Posadas?format=3"></iframe>
-  <iframe src="https://wttr.in/Puerto%20Iguazú?format=3"></iframe>
-  <iframe src="https://wttr.in/Ushuaia?format=3"></iframe>
+<script>
+const ciudades = [
+  { nombre: "Buenos Aires", lat: -34.61, lon: -58.38 },
+  { nombre: "Córdoba", lat: -31.42, lon: -64.18 },
+  { nombre: "Rosario", lat: -32.95, lon: -60.66 },
+  { nombre: "Mendoza", lat: -32.89, lon: -68.83 },
+  { nombre: "Puerto Iguazú", lat: -25.60, lon: -54.57 },
+  { nombre: "Ushuaia", lat: -54.80, lon: -68.30 }
+];
 
-</div>
+function emojiPorTemp(temp) {
+  if (temp >= 25) return "☀️";
+  if (temp >= 18) return "🌤";
+  if (temp >= 10) return "☁️";
+  if (temp >= 0) return "❄️";
+  return "🥶";
+}
+
+async function cargarClima() {
+  const contenedor = document.getElementById("clima");
+
+  for (let ciudad of ciudades) {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${ciudad.lat}&longitude=${ciudad.lon}&current=temperature_2m`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+    const temp = Math.round(data.current.temperature_2m);
+
+    contenedor.innerHTML += `
+      <div class="card">
+        <div class="emoji">${emojiPorTemp(temp)}</div>
+        <div class="city">${ciudad.nombre}</div>
+        <div class="temp">${temp}°C</div>
+      </div>
+    `;
+  }
+}
+
+cargarClima();
+</script>
 
 </body>
 </html>
