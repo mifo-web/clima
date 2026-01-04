@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Clima por Provincias - Argentina</title>
+<title>Clima por Provincias</title>
 
 <style>
 body {
@@ -11,34 +11,28 @@ body {
   padding: 15px;
   background: #f5f5f5;
 }
-
 h1 {
   text-align: center;
 }
-
-.clima-grid {
+.grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
 }
-
-.clima-card {
-  background: #ffffff;
-  border-radius: 8px;
+.card {
+  background: #fff;
   padding: 10px;
+  border-radius: 8px;
   text-align: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0,0,0,.1);
 }
-
 .nombre {
   font-weight: bold;
 }
-
 .temp {
   font-size: 22px;
   font-weight: bold;
 }
-
 .icono {
   font-size: 28px;
 }
@@ -48,10 +42,7 @@ h1 {
 <body>
 
 <h1>Clima en Argentina</h1>
-
-<div id="climas" class="clima-grid">
-  Cargando clima...
-</div>
+<div id="climas" class="grid">Cargando clima...</div>
 
 <script>
 const provincias = [
@@ -79,15 +70,14 @@ const cont = document.getElementById("climas");
 cont.innerHTML = "";
 
 provincias.forEach(p => {
-  fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current_weather=true`)
+  fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current=temperature_2m,weather_code`)
     .then(r => r.json())
     .then(d => {
-      const c = d.current_weather;
       cont.innerHTML += `
-        <div class="clima-card">
+        <div class="card">
           <div class="nombre">${p.nombre}</div>
-          <div class="icono">${icono(c.weathercode)}</div>
-          <div class="temp">${c.temperature}°C</div>
+          <div class="icono">${icono(d.current.weather_code)}</div>
+          <div class="temp">${d.current.temperature_2m}°C</div>
         </div>`;
     });
 });
