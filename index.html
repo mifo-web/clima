@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Turismo Argentino 360 | Clima</title>
+    <title>Clima Argentina | Turismo 360</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg: #f4f7f6;
-            --card: #ffffff;
             --primary: #0081a7;
-            --text: #2d3436;
+            --bg: #f8f9fa;
         }
 
         body {
@@ -20,151 +18,130 @@
             background-color: var(--bg);
             margin: 0;
             padding: 20px;
-            color: var(--text);
+            color: #333;
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1000px;
             margin: 0 auto;
             text-align: center;
         }
 
-        h1 {
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--primary);
-        }
-
-        p.subtitle {
-            margin-bottom: 40px;
-            color: #636e72;
-        }
+        h1 { color: var(--primary); margin-bottom: 5px; }
+        .subtitle { color: #666; margin-bottom: 30px; font-size: 0.9em; }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 15px;
         }
 
         .card {
-            background: var(--card);
+            background: white;
             border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
-            transition: all 0.3s ease;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: 0.3s;
         }
 
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-        }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
-        .emoji {
-            font-size: 32px;
-            display: block;
-            margin-bottom: 10px;
-        }
+        .emoji { font-size: 30px; display: block; margin-bottom: 5px; }
+        .name { font-size: 12px; font-weight: 600; color: #999; text-transform: uppercase; }
+        .temp { font-size: 22px; font-weight: 600; }
 
-        .provincia {
-            font-size: 13px;
-            font-weight: 600;
-            color: #b2bec3;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .temp {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        #loader {
-            padding: 50px;
-            font-size: 18px;
-            color: var(--primary);
-        }
-
-        /* Estilo para errores */
-        .error-msg {
-            color: #d63031;
-            padding: 20px;
-        }
+        #status { padding: 40px; color: var(--primary); font-weight: 600; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>🌤 Clima en Argentina</h1>
-        <p class="subtitle">Estado del tiempo en tiempo real para Turismo Argentino 360</p>
+        <p class="subtitle">Datos actualizados de Turismo Argentino 360</p>
         
-        <div id="loader">Cargando mapa climático...</div>
-        <div class="grid" id="clima"></div>
+        <div id="status">Obteniendo datos del tiempo...</div>
+        <div class="grid" id="clima-grid"></div>
     </div>
 
     <script>
         const provincias = [
-            ["Buenos Aires", -34.61, -58.38], ["Catamarca", -28.47, -65.78],
-            ["Chaco", -27.45, -58.99], ["Chubut", -43.30, -65.10],
-            ["Córdoba", -31.42, -64.18], ["Corrientes", -27.48, -58.83],
-            ["Entre Ríos", -31.73, -60.53], ["Formosa", -26.18, -58.17],
-            ["Jujuy", -24.18, -65.30], ["La Pampa", -36.62, -64.29],
-            ["La Rioja", -29.41, -66.85], ["Mendoza", -32.89, -68.83],
-            ["Misiones", -27.37, -55.90], ["Neuquén", -38.95, -68.06],
-            ["Río Negro", -41.13, -71.31], ["Salta", -24.78, -65.41],
-            ["San Juan", -31.54, -68.52], ["San Luis", -33.30, -66.34],
-            ["Santa Cruz", -51.62, -69.22], ["Santa Fe", -31.62, -60.69],
-            ["Santiago del Estero", -27.79, -64.26], ["Tierra del Fuego", -54.80, -68.30],
-            ["Tucumán", -26.83, -65.22], ["CABA", -34.61, -58.38]
+            {n: "Buenos Aires", lat: -34.61, lon: -58.38},
+            {n: "Catamarca", lat: -28.47, lon: -65.78},
+            {n: "Chaco", lat: -27.45, lon: -58.99},
+            {n: "Chubut", lat: -43.30, lon: -65.10},
+            {n: "Córdoba", lat: -31.42, lon: -64.18},
+            {n: "Corrientes", lat: -27.48, lon: -58.83},
+            {n: "Entre Ríos", lat: -31.73, lon: -60.53},
+            {n: "Formosa", lat: -26.18, lon: -58.17},
+            {n: "Jujuy", lat: -24.18, lon: -65.30},
+            {n: "La Pampa", lat: -36.62, lon: -64.29},
+            {n: "La Rioja", lat: -29.41, lon: -66.85},
+            {n: "Mendoza", lat: -32.89, lon: -68.83},
+            {n: "Misiones", lat: -27.37, lon: -55.90},
+            {n: "Neuquén", lat: -38.95, lon: -68.06},
+            {n: "Río Negro", lat: -41.13, lon: -71.31},
+            {n: "Salta", lat: -24.78, lon: -65.41},
+            {n: "San Juan", lat: -31.54, lon: -68.52},
+            {n: "San Luis", lat: -33.30, lon: -66.34},
+            {n: "Santa Cruz", lat: -51.62, lon: -69.22},
+            {n: "Santa Fe", lat: -31.62, lon: -60.69},
+            {n: "Sgo. del Estero", lat: -27.79, lon: -64.26},
+            {n: "T. del Fuego", lat: -54.80, lon: -68.30},
+            {n: "Tucumán", lat: -26.83, lon: -65.22},
+            {n: "CABA", lat: -34.61, lon: -58.38}
         ];
 
         function getEmoji(t) {
             if (t >= 32) return "🥵";
-            if (t >= 25) return "☀️";
-            if (t >= 18) return "🌤️";
+            if (t >= 24) return "☀️";
+            if (t >= 17) return "🌤️";
             if (t >= 10) return "☁️";
             if (t >= 0) return "❄️";
             return "🥶";
         }
 
-        async function fetchClima(p) {
+        async function cargarClima() {
+            const grid = document.getElementById("clima-grid");
+            const status = document.getElementById("status");
+
+            // Creamos las listas de latitudes y longitudes separadas por coma
+            const lats = provincias.map(p => p.lat).join(",");
+            const lons = provincias.map(p => p.lon).join(",");
+            
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=temperature_2m`;
+
             try {
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${p[1]}&longitude=${p[2]}&current=temperature_2m`;
-                const r = await fetch(url);
-                const d = await r.json();
-                return { nombre: p[0], temp: Math.round(d.current.temperature_2m) };
-            } catch (e) {
-                console.error("Error en " + p[0], e);
-                return null;
-            }
-        }
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Error en la API");
+                
+                const data = await response.json();
+                
+                // Limpiamos el cargando
+                status.style.display = "none";
+                
+                // Open-Meteo devuelve un array si le pasas múltiples coordenadas
+                data.forEach((resultado, index) => {
+                    const temp = Math.round(resultado.current.temperature_2m);
+                    const nombre = provincias[index].n;
 
-        async function cargarTodo() {
-            const contenedor = document.getElementById("clima");
-            const loader = document.getElementById("loader");
-
-            // Lanzamos todas las peticiones al mismo tiempo
-            const promesas = provincias.map(p => fetchClima(p));
-            const resultados = await Promise.all(promesas);
-
-            loader.style.display = "none";
-
-            resultados.forEach(res => {
-                if (res) {
                     const card = document.createElement("div");
                     card.className = "card";
                     card.innerHTML = `
-                        <span class="emoji">${getEmoji(res.temp)}</span>
-                        <div class="provincia">${res.nombre}</div>
-                        <div class="temp">${res.temp}°C</div>
+                        <span class="emoji">${getEmoji(temp)}</span>
+                        <div class="name">${nombre}</div>
+                        <div class="temp">${temp}°C</div>
                     `;
-                    contenedor.appendChild(card);
-                }
-            });
+                    grid.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error(error);
+                status.innerText = "Error de conexión. Prueba recargar la página.";
+                status.style.color = "red";
+            }
         }
 
-        cargarTodo();
+        cargarClima();
     </script>
 </body>
 </html>
