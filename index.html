@@ -1,119 +1,170 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Clima en Argentina</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clima en Argentina | Dashboard</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #1a1a1a;
+            --accent: #007bff;
+        }
 
-<style>
-body{
-  font-family:'Poppins',sans-serif;
-  background:#f7f7f7;
-  margin:0;
-  padding:30px;
-  color:#222;
-}
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-h1{
-  text-align:center;
-  font-weight:600;
-  margin-bottom:40px;
-}
+        h1 {
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #333;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-  gap:18px;
-  max-width:1100px;
-  margin:auto;
-}
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
 
-.card{
-  background:#fff;
-  border-radius:14px;
-  padding:16px;
-  text-align:center;
-  box-shadow:0 6px 16px rgba(0,0,0,.08);
-}
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
 
-.emoji{
-  font-size:26px;
-  margin-bottom:6px;
-}
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
 
-.provincia{
-  font-size:14px;
-  font-weight:600;
-}
+        .emoji {
+            font-size: 40px;
+            margin-bottom: 10px;
+            display: block;
+        }
 
-.temp{
-  font-size:22px;
-  margin-top:4px;
-}
-</style>
+        .provincia {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .temp {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        /* Indicador de carga */
+        #loading {
+            font-size: 18px;
+            color: #666;
+            margin-top: 50px;
+        }
+
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 12px;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
-<h1>🌤 Clima en Argentina</h1>
+    <h1>🌤 Clima en Argentina</h1>
+    
+    <div id="loading">Actualizando datos del tiempo...</div>
+    <div class="grid" id="clima"></div>
 
-<div class="grid" id="clima"></div>
+    <script>
+        // Datos corregidos: [Nombre, Latitud, Longitud]
+        const provincias = [
+            ["Buenos Aires", -34.61, -58.38],
+            ["Catamarca", -28.47, -65.78],
+            ["Chaco", -27.45, -58.99],
+            ["Chubut", -43.30, -65.10],
+            ["Córdoba", -31.42, -64.18],
+            ["Corrientes", -27.48, -58.83],
+            ["Entre Ríos", -31.73, -60.53],
+            ["Formosa", -26.18, -58.17],
+            ["Jujuy", -24.18, -65.30],
+            ["La Pampa", -36.62, -64.29],
+            ["La Rioja", -29.41, -66.85],
+            ["Mendoza", -32.89, -68.83],
+            ["Misiones", -27.37, -55.90],
+            ["Neuquén", -38.95, -68.06],
+            ["Río Negro", -41.13, -71.31],
+            ["Salta", -24.78, -65.41],
+            ["San Juan", -31.54, -68.52],
+            ["San Luis", -33.30, -66.34],
+            ["Santa Cruz", -51.62, -69.22],
+            ["Santa Fe", -31.62, -60.69],
+            ["Santiago del Estero", -27.79, -64.26],
+            ["Tierra del Fuego", -54.80, -68.30],
+            ["Tucumán", -26.83, -65.22],
+            ["CABA", -34.61, -58.38]
+        ];
 
-<script>
-const provincias=[
- {n:"Buenos Aires",-34.61,-58.38},
- {n:"Catamarca",-28.47,-65.78},
- {n:"Chaco",-27.45,-58.99},
- {n:"Chubut",-43.30,-65.10},
- {n:"Córdoba",-31.42,-64.18},
- {n:"Corrientes",-27.48,-58.83},
- {n:"Entre Ríos",-31.73,-60.53},
- {n:"Formosa",-26.18,-58.17},
- {n:"Jujuy",-24.18,-65.30},
- {n:"La Pampa",-36.62,-64.29},
- {n:"La Rioja",-29.41,-66.85},
- {n:"Mendoza",-32.89,-68.83},
- {n:"Misiones",-27.37,-55.90},
- {n:"Neuquén",-38.95,-68.06},
- {n:"Río Negro",-41.13,-71.31},
- {n:"Salta",-24.78,-65.41},
- {n:"San Juan",-31.54,-68.52},
- {n:"San Luis",-33.30,-66.34},
- {n:"Santa Cruz",-51.62,-69.22},
- {n:"Santa Fe",-31.62,-60.69},
- {n:"Santiago del Estero",-27.79,-64.26},
- {n:"Tierra del Fuego",-54.80,-68.30},
- {n:"Tucumán",-26.83,-65.22},
- {n:"CABA",-34.61,-58.38}
-];
+        function getEmoji(t) {
+            if (t >= 32) return "🥵";
+            if (t >= 25) return "☀️";
+            if (t >= 18) return "🌤️";
+            if (t >= 10) return "☁️";
+            if (t >= 0) return "❄️";
+            return "🥶";
+        }
 
-function emoji(t){
- if(t>=30)return"🔥";
- if(t>=24)return"☀️";
- if(t>=18)return"🌤";
- if(t>=10)return"☁️";
- if(t>=0)return"❄️";
- return"🥶";
-}
+        async function cargarClima() {
+            const contenedor = document.getElementById("clima");
+            const loader = document.getElementById("loading");
+            
+            try {
+                for (let p of provincias) {
+                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${p[1]}&longitude=${p[2]}&current=temperature_2m`;
+                    const respuesta = await fetch(url);
+                    const datos = await respuesta.json();
+                    const temp = Math.round(datos.current.temperature_2m);
+                    
+                    const card = document.createElement("div");
+                    card.className = "card";
+                    card.innerHTML = `
+                        <span class="emoji">${getEmoji(temp)}</span>
+                        <div class="provincia">${p[0]}</div>
+                        <div class="temp">${temp}°C</div>
+                    `;
+                    contenedor.appendChild(card);
+                }
+                loader.style.display = "none"; // Ocultar cargando al finalizar
+            } catch (error) {
+                loader.innerText = "Error al cargar los datos. Reintenta más tarde.";
+                console.error(error);
+            }
+        }
 
-async function cargar(){
- const c=document.getElementById("clima");
- for(let p of provincias){
-  const url=`https://api.open-meteo.com/v1/forecast?latitude=${p[1]}&longitude=${p[2]}&current=temperature_2m`;
-  const r=await fetch(url);
-  const d=await r.json();
-  const t=Math.round(d.current.temperature_2m);
-  c.innerHTML+=`
-   <div class="card">
-    <div class="emoji">${emoji(t)}</div>
-    <div class="provincia">${p.n}</div>
-    <div class="temp">${t}°C</div>
-   </div>`;
- }
-}
-cargar();
-</script>
-
+        cargarClima();
+    </script>
 </body>
 </html>
