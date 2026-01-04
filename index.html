@@ -18,26 +18,15 @@ h1 {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
 }
 
-.card {
-  background: #ffffff;
+iframe {
+  width: 100%;
+  height: 150px;
+  border: none;
   border-radius: 8px;
-  padding: 12px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.nombre {
-  font-weight: bold;
-  margin-bottom: 6px;
-}
-
-.temp {
-  font-size: 22px;
-  font-weight: bold;
 }
 </style>
 </head>
@@ -46,23 +35,18 @@ h1 {
 
 <h1>Clima en Argentina</h1>
 
-<div id="climas" class="grid">Cargando clima...</div>
+<div class="grid">
 
-<script>
-const ciudades = [
-  "Buenos Aires",
-  "Córdoba",
-  "Santa Fe",
-  "Mendoza",
-  "Salta",
-  "Posadas",
-  "Puerto Iguazú",
-  "Comodoro Rivadavia",
-  "Ushuaia"
-];
+  <iframe src="https://wttr.in/Buenos%20Aires?format=3"></iframe>
+  <iframe src="https://wttr.in/Córdoba?format=3"></iframe>
+  <iframe src="https://wttr.in/Santa%20Fe?format=3"></iframe>
+  <iframe src="https://wttr.in/Mendoza?format=3"></iframe>
+  <iframe src="https://wttr.in/Salta?format=3"></iframe>
+  <iframe src="https://wttr.in/Posadas?format=3"></iframe>
+  <iframe src="https://wttr.in/Puerto%20Iguazú?format=3"></iframe>
+  <iframe src="https://wttr.in/Ushuaia?format=3"></iframe>
 
-const contenedor = document.getElementById("climas");
-contenedor.innerHTML = "";
+</div>
 
-ciudades.forEach(ciudad => {
-  fetch("https://wttr.in/" + encodeURIComponent(ciudad
+</body>
+</html>
